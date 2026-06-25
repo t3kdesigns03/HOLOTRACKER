@@ -31,12 +31,9 @@ export function CardSearchPanel({ onSelectCard }: Props) {
   const [results,    setResults]    = useState<PokemonCardAPI[]>([])
   const [totalCount, setTotalCount] = useState(0)
   const [loading,    setLoading]    = useState(false)
-  const [error,      setError]      = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>()
-  const pageSize    = 15
-
-  const doSearch = useCallback(async (params: CardSearchParams) => {
+  const debounceRef = useRef<NodeJS.Timeout | null>(null)  const doSearch = useCallback(async (params: CardSearchParams) => {
     setLoading(true)
     setError(null)
     try {
