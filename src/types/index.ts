@@ -315,14 +315,6 @@ export function getMarketPrice(
 ): number | null {
   if (!prices?.prices) return null
 
-export function getAvailablePrintTypes(card: PokemonCardAPI): PrintType[]
-const prices = card.tcgplayer?.prices
-if (!prices) return ['normal']
-return Object.keys(prices).filter(k =>
-  PRINT_TYPE_LABELS[k as PrintType]
-) as PrintType[]
-}
-
   const p = prices.prices
   switch (printType) {
     case 'holofoil':        return p.holofoil?.market ?? null
