@@ -315,6 +315,14 @@ export function getMarketPrice(
 ): number | null {
   if (!prices?.prices) return null
 
+export function getAvailablePrintTypes(card: PokemonCardAPI): PrintType[]
+const prices = card.tcgplayer?.prices
+if (!prices) return ['normal']
+return Object.keys(prices).filter(k =>
+  PRINT_TYPE_LABELS[k as PrintType]
+) as PrintType[]
+}
+
   const p = prices.prices
   switch (printType) {
     case 'holofoil':        return p.holofoil?.market ?? null
@@ -334,4 +342,12 @@ export function isHoloCard(rarity?: string | null, printType?: PrintType): boole
     'Rare Shiny', 'Rare Shining', 'LEGEND', 'Illustration Rare',
     'Special Illustration Rare', 'Hyper Rare', 'Double Rare']
   return holoRarities.some(r => rarity.includes(r))
+}
+
+/** Get available print types from TCGPlayer prices */
+export function getAvailablePrintTypes(prices?: TCGPlayerPrices | null): PrintType[] {
+  if (!prices?.prices) return ['normal']
+  return Object.keys(prices.prices).filter(
+    k => PRINT_TYPE_LABELS[k as PrintType] !== undefined
+  ) as PrintType[]
 }

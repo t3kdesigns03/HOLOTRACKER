@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/supabase/client'
 import type { PokemonCardAPI, PokemonCardRow, CardSearchParams, CardSearchResult, TCGPlayerPrices } from '@/types'
 
 const BASE_URL = 'https://api.pokemontcg.io/v2'
@@ -37,7 +37,7 @@ export async function searchCards(params: CardSearchParams): Promise<CardSearchR
 }
 
 export async function getCard(cardId: string): Promise<PokemonCardRow | null> {
-  const supabase = await createClient()
+  const supabase = createClient()
   const { data: cached } = await supabase.from('pokemon_cards').select('*').eq('id', cardId).maybeSingle()
   if (cached) {
     const updatedAt = cached.price_updated_at ? new Date(cached.price_updated_at) : null
