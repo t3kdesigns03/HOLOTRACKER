@@ -1,0 +1,39 @@
+/* src/app/globals.css — append these to your existing globals.css */
+
+/* ── Field utilities (used throughout forms) ───────────────── */
+@layer components {
+  .field-label {
+    @apply block text-xs font-medium text-zinc-500 uppercase tracking-wide;
+  }
+
+  .field {
+    @apply w-full px-3 py-2 bg-zinc-900 border border-zinc-700 rounded-lg
+      text-sm text-white placeholder:text-zinc-600
+      focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500
+      transition-colors;
+  }
+
+  .icon-btn {
+    @apply p-1.5 rounded-lg bg-zinc-800 border border-zinc-700
+      text-zinc-400 hover:text-white hover:bg-zinc-700 transition-colors;
+  }
+}
+
+/* ── Scrollbar (thin + dark) ───────────────────────────────── */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: #3f3f46 transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 4px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: #3f3f46;
+  border-radius: 4px;
+}

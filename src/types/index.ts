@@ -1,0 +1,337 @@
+// ============================================================
+// Jokemon TCG - Core TypeScript Types
+// src/types/index.ts
+// ============================================================
+
+// ── Pokémon TCG API Types ────────────────────────────────────
+
+export interface PokemonSet {
+  id: string
+  name: string
+  series: string
+  printedTotal: number
+  total: number
+  releaseDate: string
+  images: {
+    symbol: string
+    logo: string
+  }
+}
+
+export interface TCGPrice {
+  low?: number
+  mid?: number
+  high?: number
+  market?: number
+  directLow?: number
+}
+
+export interface TCGPlayerPrices {
+  url?: string
+  updatedAt?: string
+  prices?: {
+    normal?: TCGPrice
+    holofoil?: TCGPrice
+    reverseHolofoil?: TCGPrice
+    firstEdition?: TCGPrice
+    firstEditionHolofoil?: TCGPrice
+    unlimited?: TCGPrice
+    unlimitedHolofoil?: TCGPrice
+    '1stEdition'?: TCGPrice
+    '1stEditionHolofoil'?: TCGPrice
+  }
+}
+
+export interface CardmarketPrices {
+  url?: string
+  updatedAt?: string
+  prices?: {
+    averageSellPrice?: number
+    lowPrice?: number
+    trendPrice?: number
+    avg1?: number
+    avg7?: number
+    avg30?: number
+  }
+}
+
+export interface PokemonCardAPI {
+  id: string
+  name: string
+  supertype: 'Pokémon' | 'Trainer' | 'Energy'
+  subtypes: string[]
+  hp?: string
+  types?: string[]
+  evolvesWith?: string[]
+  evolvesFrom?: string
+  rules?: string[]
+  number: string
+  artist?: string
+  rarity?: string
+  flavorText?: string
+  nationalPokedexNumbers?: number[]
+  set: PokemonSet
+  images: {
+    small: string
+    large: string
+  }
+  tcgplayer?: TCGPlayerPrices
+  cardmarket?: CardmarketPrices
+}
+
+// ── Database Row Types ───────────────────────────────────────
+
+export interface Profile {
+  id: string
+  username: string | null
+  display_name: string | null
+  bio: string | null
+  avatar_url: string | null
+  collection_public: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface PokemonCardRow {
+  id: string
+  name: string
+  set_id: string
+  set_name: string
+  set_series: string | null
+  set_logo_url: string | null
+  set_symbol_url: string | null
+  number: string
+  rarity: string | null
+  supertype: string | null
+  subtypes: string[] | null
+  hp: string | null
+  types: string[] | null
+  evolves_from: string | null
+  image_url: string | null
+  image_url_small: string | null
+  tcgplayer_prices: TCGPlayerPrices | null
+  cardmarket_prices: CardmarketPrices | null
+  price_updated_at: string | null
+  raw_data: PokemonCardAPI | null
+  created_at: string
+}
+
+export type CardCondition = 'NM' | 'LP' | 'MP' | 'HP' | 'DMG'
+export type CardStatus = 'collection' | 'for_sale' | 'pending' | 'traded'
+export type PrintType =
+  | 'normal'
+  | 'holofoil'
+  | 'reverseHolofoil'
+  | 'firstEdition'
+  | 'shadowless'
+  | 'fullArt'
+  | 'altArt'
+  | 'promo'
+  | 'other'
+export type GradingCompany = 'PSA' | 'BGS' | 'CGC'
+
+export interface UserCardRow {
+  id: string
+  user_id: string
+  card_id: string
+  quantity: number
+  condition: CardCondition
+  print_type: PrintType
+  cost_basis: number | null
+  acquired_at: string | null
+  acquisition_notes: string | null
+  storage_location: string | null
+  status: CardStatus
+  is_public: boolean
+  asking_price: number | null
+  is_graded: boolean
+  grading_company: GradingCompany | null
+  grade: string | null
+  cert_number: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface SaleLogRow {
+  id: string
+  user_id: string
+  user_card_id: string | null
+  card_id: string | null
+  card_snapshot: CardSnapshot
+  quantity_sold: number
+  cost_basis: number | null
+  sale_price: number
+  platform: string | null
+  fees: number
+  net_profit: number     // generated column
+  margin_pct: number | null
+  sold_at: string
+  notes: string | null
+  created_at: string
+}
+
+export interface WishlistRow {
+  id: string
+  user_id: string
+  card_id: string
+  print_type: string
+  max_price: number | null
+  priority: 1 | 2 | 3
+  notes: string | null
+  created_at: string
+}
+
+// ── Composite / View Types ───────────────────────────────────
+
+export interface CardSnapshot {
+  name: string
+  set_name: string
+  number: string
+  image_url: string | null
+  print_type: PrintType
+  condition: CardCondition
+}
+
+/** UserCard joined with the cached PokemonCardRow */
+export interface InventoryCard extends UserCardRow {
+  card: PokemonCardRow
+  /** Derived at render time from tcgplayer_prices + print_type */
+  market_price: number | null
+  /** (market_price * quantity) - (cost_basis * quantity) */
+  unrealized_pl: number | null
+}
+
+/** Form data for adding/editing a card in inventory */
+export interface AddCardForm {
+  card_id: string
+  quantity: number
+  condition: CardCondition
+  print_type: PrintType
+  cost_basis: string   // string for controlled inputs, parse before save
+  acquired_at: string
+  acquisition_notes: string
+  storage_location: string
+  status: CardStatus
+  is_public: boolean
+  asking_price: string
+  is_graded: boolean
+  grading_company: GradingCompany | ''
+  grade: string
+  cert_number: string
+}
+
+/** Form data for recording a sale */
+export interface RecordSaleForm {
+  user_card_id: string
+  quantity_sold: number
+  sale_price: string
+  platform: string
+  fees: string
+  sold_at: string
+  notes: string
+}
+
+// ── Search / Filter Types ────────────────────────────────────
+
+export interface CardSearchParams {
+  q?: string           // free text (name)
+  set?: string         // set id
+  supertype?: string
+  types?: string[]
+  rarity?: string
+  page?: number
+  pageSize?: number
+}
+
+export interface CardSearchResult {
+  data: PokemonCardAPI[]
+  page: number
+  pageSize: number
+  count: number
+  totalCount: number
+}
+
+// ── Analytics Types ──────────────────────────────────────────
+
+export interface PortfolioStats {
+  total_cards: number
+  total_quantity: number
+  total_invested: number
+  total_market_value: number
+  unrealized_pl: number
+  unrealized_pl_pct: number
+  realized_pl: number
+  realized_fees: number
+}
+
+// ── Utility ──────────────────────────────────────────────────
+
+export const CONDITION_LABELS: Record<CardCondition, string> = {
+  NM:  'Near Mint',
+  LP:  'Lightly Played',
+  MP:  'Moderately Played',
+  HP:  'Heavily Played',
+  DMG: 'Damaged',
+}
+
+export const CONDITION_COLORS: Record<CardCondition, string> = {
+  NM:  'text-emerald-400',
+  LP:  'text-green-400',
+  MP:  'text-yellow-400',
+  HP:  'text-orange-400',
+  DMG: 'text-red-400',
+}
+
+export const PRINT_TYPE_LABELS: Record<PrintType, string> = {
+  normal:           'Normal',
+  holofoil:         'Holo',
+  reverseHolofoil:  'Reverse Holo',
+  firstEdition:     '1st Edition',
+  shadowless:       'Shadowless',
+  fullArt:          'Full Art',
+  altArt:           'Alt Art',
+  promo:            'Promo',
+  other:            'Other',
+}
+
+export const STATUS_LABELS: Record<CardStatus, string> = {
+  collection: 'In Collection',
+  for_sale:   'For Sale',
+  pending:    'Pending',
+  traded:     'Traded',
+}
+
+export const STATUS_COLORS: Record<CardStatus, string> = {
+  collection: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
+  for_sale:   'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+  pending:    'bg-yellow-500/20 text-yellow-300 border-yellow-500/30',
+  traded:     'bg-zinc-500/20 text-zinc-400 border-zinc-500/30',
+}
+
+/** Extract the best market price for a given print type */
+export function getMarketPrice(
+  prices: TCGPlayerPrices | null | undefined,
+  printType: PrintType
+): number | null {
+  if (!prices?.prices) return null
+
+  const p = prices.prices
+  switch (printType) {
+    case 'holofoil':        return p.holofoil?.market ?? null
+    case 'reverseHolofoil': return p.reverseHolofoil?.market ?? null
+    case 'firstEdition':    return p['1stEditionHolofoil']?.market ?? p['1stEdition']?.market ?? null
+    default:                return p.normal?.market ?? null
+  }
+}
+
+/** Determine if a card is holographic based on rarity / print type */
+export function isHoloCard(rarity?: string | null, printType?: PrintType): boolean {
+  if (printType && ['holofoil','reverseHolofoil','firstEdition','shadowless','fullArt','altArt'].includes(printType)) {
+    return true
+  }
+  if (!rarity) return false
+  const holoRarities = ['Rare Holo', 'Rare Ultra', 'Rare Secret', 'Rare Rainbow',
+    'Rare Shiny', 'Rare Shining', 'LEGEND', 'Illustration Rare',
+    'Special Illustration Rare', 'Hyper Rare', 'Double Rare']
+  return holoRarities.some(r => rarity.includes(r))
+}
