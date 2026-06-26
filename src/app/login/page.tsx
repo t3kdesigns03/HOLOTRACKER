@@ -137,11 +137,21 @@ function LoginForm() {
     setLoading(true); setError(null); setMessage(null)
     if (mode === 'login') {
       const { error } = await supabase.auth.signInWithPassword({ email, password })
-      if (error) { setError(error.message); setLoading(false); return }
+      if (error) {
+        const msg = error.message && error.message !== '{}'
+          ? error.message
+          : 'Sign in failed. Check your email and password.'
+        setError(msg); setLoading(false); return
+      }
       router.push('/inventory'); router.refresh()
     } else {
       const { error } = await supabase.auth.signUp({ email, password })
-      if (error) { setError(error.message); setLoading(false); return }
+      if (error) {
+        const msg = error.message && error.message !== '{}'
+          ? error.message
+          : 'Sign up failed — the server returned an error. Check that your Supabase project is active and email signup is enabled.'
+        setError(msg); setLoading(false); return
+      }
       setMessage('Check your email to confirm your account, then sign in.')
       setLoading(false)
     }
