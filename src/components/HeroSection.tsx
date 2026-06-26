@@ -365,7 +365,7 @@ export default function HeroSection() {
               <span style={{ color: "rgba(160,120,255,.45)", fontSize: "0.9em" }}>Your Pokémon TCG collection, mastered.</span>
             </p>
             <div className="ht-btns">
-              <a href="/signup" className="ht-btn-primary">✦ Start Tracking</a>
+              <a href="/login?mode=signup" className="ht-btn-primary">✦ Start Tracking</a>
               <a href="/login" className="ht-btn-ghost">Sign In</a>
             </div>
             <div className="ht-chips">
