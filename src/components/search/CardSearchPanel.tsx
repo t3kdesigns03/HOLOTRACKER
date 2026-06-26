@@ -34,7 +34,7 @@ export function CardSearchPanel({ onSelectCard }: Props) {
   const [error, setError] = useState<string | null>(null)
 
   const pageSize = 20
-  const debounceRef = useRef<NodeJS.Timeout | null>(null)
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   const doSearch = useCallback(async (params: CardSearchParams) => {
     setLoading(true)
