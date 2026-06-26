@@ -1,4 +1,4 @@
-'use client'
+ 'use client'
 // ============================================================
 // CardSearchPanel — debounced search with filters + pagination
 // src/components/search/CardSearchPanel.tsx
@@ -33,7 +33,10 @@ export function CardSearchPanel({ onSelectCard }: Props) {
   const [loading,    setLoading]    = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const debounceRef = useRef<NodeJS.Timeout | null>(null)  const doSearch = useCallback(async (params: CardSearchParams) => {
+  const pageSize = 20
+  const debounceRef = useRef<NodeJS.Timeout | null>(null)
+
+  const doSearch = useCallback(async (params: CardSearchParams) => {
     setLoading(true)
     setError(null)
     try {
