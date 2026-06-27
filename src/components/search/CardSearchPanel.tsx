@@ -101,6 +101,13 @@ export function CardSearchPanel({ onSelectCard }: Props) {
           type="text"
           value={query}
           onChange={e => setQuery(e.target.value)}
+          onKeyDown={e => {
+            if (e.key === 'Enter' && (query || supertype || rarity)) {
+              clearTimeout(debounceRef.current)
+              setPage(1)
+              doSearch({ q: query, supertype, rarity, page: 1, pageSize })
+            }
+          }}
           placeholder="Search by card name…"
           className="w-full pl-9 pr-9 py-2.5 bg-zinc-900 border border-zinc-700 rounded-lg
             text-sm text-white placeholder:text-zinc-600

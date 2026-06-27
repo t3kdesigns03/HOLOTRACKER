@@ -165,11 +165,49 @@ function LoginForm() {
           from { filter: drop-shadow(0 0 22px rgba(168,85,247,.55)); }
           to   { filter: drop-shadow(0 0 44px rgba(200,140,255,.9)); }
         }
+        .ht-login-grid {
+          min-height: 100svh;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          background: #04040e;
+        }
+        .ht-card-col {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 16px;
+          padding: 40px 24px;
+          background: radial-gradient(ellipse 80% 70% at 50% 50%, rgba(80,20,160,.25) 0%, transparent 70%);
+        }
+        .ht-form-col {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 40px 32px;
+          border-left: 1px solid rgba(255,255,255,0.04);
+        }
+        @media (max-width: 768px) {
+          .ht-login-grid {
+            grid-template-columns: 1fr;
+            grid-template-rows: auto 1fr;
+          }
+          .ht-card-col {
+            padding: 32px 24px 16px;
+            gap: 10px;
+            background: radial-gradient(ellipse 100% 80% at 50% 60%, rgba(80,20,160,.3) 0%, transparent 70%);
+          }
+          .ht-form-col {
+            border-left: none;
+            border-top: 1px solid rgba(255,255,255,0.04);
+            padding: 28px 24px 40px;
+          }
+        }
       `}</style>
-      <div style={{ minHeight: '100svh', display: 'grid', gridTemplateColumns: '1fr 1fr', background: '#04040e' }}>
+      <div className="ht-login-grid">
 
-        {/* Left — card display */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, padding: '40px 24px', background: 'radial-gradient(ellipse 80% 70% at 50% 50%, rgba(80,20,160,.25) 0%, transparent 70%)' }}>
+        {/* Top on mobile / Left on desktop — card display */}
+        <div className="ht-card-col">
           <HeroHoloCard card={card} loading={cardLoading} />
           <button
             onClick={loadCard}
@@ -181,8 +219,8 @@ function LoginForm() {
           <p style={{ color: 'rgba(130,90,190,.35)', fontSize: 9, fontFamily: 'system-ui,sans-serif', letterSpacing: '0.08em', marginTop: 0 }}>drag to reveal foil</p>
         </div>
 
-        {/* Right — form */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 32px', borderLeft: '1px solid rgba(255,255,255,0.04)' }}>
+        {/* Bottom on mobile / Right on desktop — form */}
+        <div className="ht-form-col">
           <div style={{ width: '100%', maxWidth: 340 }}>
             <div style={{ textAlign: 'center', marginBottom: 32 }}>
               <h1 style={{ fontSize: 28, fontWeight: 800, color: '#fff', fontFamily: 'system-ui,sans-serif', margin: '0 0 6px', background: 'linear-gradient(130deg,#fff 0%,#c084fc 60%,#a855f7 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', animation: 'htGlowPulse 3s ease-in-out infinite alternate' }}>

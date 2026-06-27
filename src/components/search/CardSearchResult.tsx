@@ -24,9 +24,11 @@ const RARITY_BADGE: Record<string, string> = {
 
 export function CardSearchResult({ card, onSelect }: Props) {
   const printTypes = getAvailablePrintTypes(card.tcgplayer) as PrintType[]
-  const marketPrice = card.tcgplayer?.prices?.normal?.market
-    ?? card.tcgplayer?.prices?.holofoil?.market
-    ?? null
+  // Find the best available market price across all print types
+  const allPriceSlots = Object.values(
+    (card.tcgplayer?.prices ?? {}) as Record<string, { market?: number | null }>
+  )
+  const marketPrice = allPriceSlots.find(p => p?.market != null)?.market ?? null
 
   const rarityColor = card.rarity
     ? (RARITY_BADGE[card.rarity] ?? 'text-zinc-400')
