@@ -9,7 +9,6 @@
 // ============================================================
 
 import React, { useRef, useCallback, useEffect, useState } from 'react'
-import Image from 'next/image'
 import { isHoloCard, type PrintType } from '@/types'
 
 export interface HoloCardProps {
@@ -199,15 +198,14 @@ export function HoloCard({
         }}
       >
         {imageUrl ? (
-          <Image
+          // Plain img tag — pokemontcg.io images come from their CDN and don't
+          // need Next.js image optimization. Using <img> avoids remotePatterns config.
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
             src={imageUrl}
             alt={name}
-            fill
-            sizes={`${width}px`}
-            className="object-contain"
-            priority={false}
-            placeholder={imageUrlSmall ? 'blur' : 'empty'}
-            blurDataURL={imageUrlSmall ?? undefined}
+            className="absolute inset-0 w-full h-full object-contain"
+            loading="lazy"
           />
         ) : fallback}
 

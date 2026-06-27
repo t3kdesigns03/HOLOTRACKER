@@ -2,13 +2,11 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { LayoutGrid, Search, TrendingUp, LogOut, Wand2 } from 'lucide-react'
+import { LayoutGrid, Search, LogOut } from 'lucide-react'
 
 const links = [
   { href: '/inventory', label: 'Inventory', icon: LayoutGrid },
   { href: '/search',    label: 'Add Cards', icon: Search },
-  { href: '/analytics', label: 'Analytics', icon: TrendingUp },
-  { href: '/create',    label: 'Create',    icon: Wand2 },
 ]
 
 export function Nav() {
