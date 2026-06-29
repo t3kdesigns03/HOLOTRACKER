@@ -20,7 +20,26 @@ async function fetchFromAPI<T>(path: string, params?: Record<string, string>): P
 export async function searchCards(params: CardSearchParams): Promise<CardSearchResult> {
   const { q, set, supertype, types, rarity, page = 1, pageSize = 20 } = params
   const queryParts: string[] = []
-  if (q)         queryParts.push(`name:"${q}*"`)
+
+  if (q) {
+    const words = q.trim().split(/\s+/).filter(Boolean)
+    // If the last word is a pure number, treat it as a card number filter
+    const lastWord = words[words.length - 1]
+    const isNumber = /^\d+$/.test(lastWord)
+    const nameWords = isNumber ? words.slice(0, -1) : words
+    const cardNumber = isNumber ? lastWord : null
+
+    if (nameWords.length > 0) {
+      // Each word is an AND term on the name field; last word gets a wildcard
+      // (Lucene does NOT support wildcards inside quoted phrases, so we avoid quotes here)
+      const nameParts = nameWords.map((w, i) =>
+        i === nameWords.length - 1 ? `name:${w}*` : `name:${w}`
+      )
+      queryParts.push(nameParts.join(' '))
+    }
+    if (cardNumber) queryParts.push(`number:${cardNumber}`)
+  }
+
   if (set)       queryParts.push(`set.id:${set}`)
   if (supertype) queryParts.push(`supertype:"${supertype}"`)
   if (types?.length) queryParts.push(`types:${types.join(',')}`)

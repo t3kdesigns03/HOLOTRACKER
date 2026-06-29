@@ -231,6 +231,34 @@ export interface RecordSaleForm {
   notes: string
 }
 
+// ── eBay Types ───────────────────────────────────────────────
+
+export interface EbayListing {
+  itemId: string
+  title: string
+  price: number
+  currency: string
+  condition: string
+  imageUrl: string
+  itemUrl: string
+  sellerLocation: string
+  endTime: string
+  source: 'ebay'
+}
+
+export interface EbaySoldListing {
+  itemId: string
+  title: string
+  soldPrice: number
+  currency: string
+  soldDate: string
+  condition: string
+  imageUrl: string
+  itemUrl: string
+  sellerLocation: string
+  source: 'ebay'
+}
+
 // ── Search / Filter Types ────────────────────────────────────
 
 export interface CardSearchParams {

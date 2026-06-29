@@ -49,7 +49,7 @@ export function CardSearchResult({ card, onSelect }: Props) {
           name={card.name}
           rarity={card.rarity}
           width={52}
-          static
+          compact
         />
       </div>
 

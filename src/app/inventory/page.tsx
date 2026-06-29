@@ -6,13 +6,14 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import {
-  LayoutGrid, List, Plus, Search, RefreshCw,
+  LayoutGrid, List, Plus, Search,
   TrendingUp, TrendingDown, Minus as FlatIcon
 } from 'lucide-react'
 import Link from 'next/link'
 import { HoloCard, MiniCard } from '@/components/card/HoloCard'
 import { StatusBadge } from '@/components/ui/StatusBadge'
 import { InventoryTableRow } from '@/components/inventory/InventoryTableRow'
+import { CardAnalyticsPanel } from '@/components/card/CardAnalyticsPanel'
 import {
   getMarketPrice, STATUS_COLORS, STATUS_LABELS,
   CONDITION_LABELS, PRINT_TYPE_LABELS,
@@ -57,13 +58,14 @@ function computeInventoryCard(raw: {
 }
 
 export default function InventoryPage() {
-  const [cards,     setCards]     = useState<InventoryCard[]>([])
-  const [loading,   setLoading]   = useState(true)
-  const [view,      setView]      = useState<ViewMode>('table')
-  const [status,    setStatus]    = useState<CardStatus | ''>('')
-  const [search,    setSearch]    = useState('')
-  const [sortKey,   setSortKey]   = useState<SortKey>('added')
-  const [sortDesc,  setSortDesc]  = useState(true)
+  const [cards,        setCards]       = useState<InventoryCard[]>([])
+  const [loading,      setLoading]     = useState(true)
+  const [view,         setView]        = useState<ViewMode>('grid')   // 3D grid by default
+  const [status,       setStatus]      = useState<CardStatus | ''>('')
+  const [search,       setSearch]      = useState('')
+  const [sortKey,      setSortKey]     = useState<SortKey>('added')
+  const [sortDesc,     setSortDesc]    = useState(true)
+  const [analyticsCard, setAnalyticsCard] = useState<InventoryCard | null>(null)
 
   const fetchInventory = useCallback(async () => {
     setLoading(true)
@@ -327,14 +329,16 @@ export default function InventoryPage() {
           </div>
         )}
 
-        {/* Grid view */}
+        {/* Grid view — 3D HoloCards */}
         {!loading && filtered.length > 0 && view === 'grid' && (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
             {filtered.map(card => (
-              <div
+              <button
                 key={card.id}
-                className="flex flex-col items-center gap-2 p-3 rounded-xl
-                  bg-zinc-900/50 border border-zinc-800 hover:border-zinc-600 transition-colors"
+                onClick={() => setAnalyticsCard(card)}
+                className="group flex flex-col items-center gap-2 p-3 rounded-xl
+                  bg-zinc-900/50 border border-zinc-800 hover:border-purple-500/40
+                  hover:bg-zinc-900 transition-all duration-200 text-center"
               >
                 <HoloCard
                   imageUrl={card.card.image_url}
@@ -343,9 +347,8 @@ export default function InventoryPage() {
                   rarity={card.card.rarity}
                   printType={card.print_type as Parameters<typeof HoloCard>[0]['printType']}
                   width={120}
-                  compact
                 />
-                <div className="w-full text-center">
+                <div className="w-full">
                   <div className="text-xs font-medium text-white truncate">{card.card.name}</div>
                   <div className="text-[10px] text-zinc-600 truncate">
                     {card.card.set_name} #{card.card.number}
@@ -372,8 +375,11 @@ export default function InventoryPage() {
                       {STATUS_LABELS[card.status]}
                     </span>
                   </div>
+                  <div className="mt-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span className="text-[10px] text-purple-400 font-medium">View Analytics →</span>
+                  </div>
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         )}
@@ -382,9 +388,28 @@ export default function InventoryPage() {
         {!loading && filtered.length > 0 && (
           <div className="text-center text-xs text-zinc-700 mt-4">
             Showing {filtered.length} of {cards.length} cards
+            {view === 'grid' && (
+              <span className="ml-2 text-zinc-800">· click any card for analytics</span>
+            )}
           </div>
         )}
       </div>
+
+      {/* Card analytics panel */}
+      {analyticsCard && (
+        <CardAnalyticsPanel
+          cardName={analyticsCard.card.name}
+          imageUrl={analyticsCard.card.image_url}
+          imageUrlSmall={analyticsCard.card.image_url_small}
+          rarity={analyticsCard.card.rarity}
+          printType={analyticsCard.print_type as Parameters<typeof CardAnalyticsPanel>[0]['printType']}
+          setName={analyticsCard.card.set_name}
+          cardNumber={analyticsCard.card.number}
+          tcgplayer={analyticsCard.card.tcgplayer_prices}
+          cardmarket={analyticsCard.card.cardmarket_prices}
+          onClose={() => setAnalyticsCard(null)}
+        />
+      )}
     </div>
   )
 }
