@@ -14,10 +14,11 @@ import { HoloCard, MiniCard } from '@/components/card/HoloCard'
 import { StatusBadge } from '@/components/ui/StatusBadge'
 import { InventoryTableRow } from '@/components/inventory/InventoryTableRow'
 import { CardAnalyticsPanel } from '@/components/card/CardAnalyticsPanel'
+import { CardViewer } from '@/components/card/CardViewer'
 import {
   getMarketPrice, STATUS_COLORS, STATUS_LABELS,
   CONDITION_LABELS, PRINT_TYPE_LABELS,
-  type InventoryCard, type CardStatus
+  type InventoryCard, type CardStatus, type PrintType
 } from '@/types'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
@@ -65,6 +66,7 @@ export default function InventoryPage() {
   const [search,       setSearch]      = useState('')
   const [sortKey,      setSortKey]     = useState<SortKey>('added')
   const [sortDesc,     setSortDesc]    = useState(true)
+  const [viewerCard,    setViewerCard]    = useState<InventoryCard | null>(null)
   const [analyticsCard, setAnalyticsCard] = useState<InventoryCard | null>(null)
 
   const fetchInventory = useCallback(async () => {
@@ -335,7 +337,7 @@ export default function InventoryPage() {
             {filtered.map(card => (
               <button
                 key={card.id}
-                onClick={() => setAnalyticsCard(card)}
+                onClick={() => setViewerCard(card)}
                 className="group flex flex-col items-center gap-2 p-3 rounded-xl
                   bg-zinc-900/50 border border-zinc-800 hover:border-purple-500/40
                   hover:bg-zinc-900 transition-all duration-200 text-center"
@@ -376,7 +378,7 @@ export default function InventoryPage() {
                     </span>
                   </div>
                   <div className="mt-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <span className="text-[10px] text-purple-400 font-medium">View Analytics →</span>
+                    <span className="text-[10px] text-purple-400 font-medium">View Card →</span>
                   </div>
                 </div>
               </button>
@@ -395,6 +397,22 @@ export default function InventoryPage() {
         )}
       </div>
 
+      {/* Fullscreen card viewer */}
+      {viewerCard && !analyticsCard && (
+        <CardViewer
+          imageUrl={viewerCard.card.image_url}
+          imageUrlSmall={viewerCard.card.image_url_small}
+          name={viewerCard.card.name}
+          setName={viewerCard.card.set_name}
+          cardNumber={viewerCard.card.number}
+          rarity={viewerCard.card.rarity}
+          printType={viewerCard.print_type as PrintType}
+          marketPrice={viewerCard.market_price}
+          onClose={() => setViewerCard(null)}
+          onViewAnalytics={() => setAnalyticsCard(viewerCard)}
+        />
+      )}
+
       {/* Card analytics panel */}
       {analyticsCard && (
         <CardAnalyticsPanel
@@ -402,12 +420,12 @@ export default function InventoryPage() {
           imageUrl={analyticsCard.card.image_url}
           imageUrlSmall={analyticsCard.card.image_url_small}
           rarity={analyticsCard.card.rarity}
-          printType={analyticsCard.print_type as Parameters<typeof CardAnalyticsPanel>[0]['printType']}
+          printType={analyticsCard.print_type as PrintType}
           setName={analyticsCard.card.set_name}
           cardNumber={analyticsCard.card.number}
           tcgplayer={analyticsCard.card.tcgplayer_prices}
           cardmarket={analyticsCard.card.cardmarket_prices}
-          onClose={() => setAnalyticsCard(null)}
+          onClose={() => { setAnalyticsCard(null); setViewerCard(null) }}
         />
       )}
     </div>
