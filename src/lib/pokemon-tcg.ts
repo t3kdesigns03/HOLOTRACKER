@@ -30,12 +30,15 @@ export async function searchCards(params: CardSearchParams): Promise<CardSearchR
     const cardNumber = isNumber ? lastWord : null
 
     if (nameWords.length > 0) {
-      // Each word is an AND term on the name field; last word gets a wildcard
-      // (Lucene does NOT support wildcards inside quoted phrases, so we avoid quotes here)
-      const nameParts = nameWords.map((w, i) =>
-        i === nameWords.length - 1 ? `name:${w}*` : `name:${w}`
-      )
-      queryParts.push(nameParts.join(' '))
+      if (nameWords.length === 1) {
+        // Single word — prefix wildcard for broad matching
+        queryParts.push(`name:${nameWords[0]}*`)
+      } else {
+        // Multi-word — quoted phrase match is most accurate.
+        // pokemontcg.io Lucene supports wildcards OUTSIDE quotes only,
+        // so we use quoted phrase for the full name.
+        queryParts.push(`name:"${nameWords.join(' ')}"`)
+      }
     }
     if (cardNumber) queryParts.push(`number:${cardNumber}`)
   }

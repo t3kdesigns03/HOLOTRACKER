@@ -101,14 +101,34 @@ export function CardAnalyticsPanel({
   const [loadingS,  setLoadingS]  = useState(true)
   const [activeTab, setActiveTab] = useState<TabId>('overview')
 
+  // PriceCharting — loose (raw/ungraded) + graded price for best-matching product
+  const [pcLoose,   setPcLoose]   = useState<number | null>(null)
+  const [pcGraded,  setPcGraded]  = useState<number | null>(null)
+  const [pcUrl,     setPcUrl]     = useState<string>('')
+
   useEffect(() => {
     setListings([]); setSold([])
+    setPcLoose(null); setPcGraded(null); setPcUrl('')
     setLoadingL(true); setLoadingS(true)
     const q = encodeURIComponent(cardName)
     fetch(`/api/ebay/listings?q=${q}`)
       .then(r => r.json()).then(setListings).catch(() => {}).finally(() => setLoadingL(false))
     fetch(`/api/ebay/sold?q=${q}`)
       .then(r => r.json()).then(setSold).catch(() => {}).finally(() => setLoadingS(false))
+    // PriceCharting — pick the closest name match
+    fetch(`/api/pricecharting?q=${q}`)
+      .then(r => r.json())
+      .then((results: Array<{ id: number; name: string; loosePrice: number | null; gradedPrice: number | null; url: string }>) => {
+        if (!results?.length) return
+        const nameLo = cardName.toLowerCase()
+        const best = results.find(r =>
+          r.name.toLowerCase().split(/\s+/).some(w => nameLo.includes(w) && w.length > 3)
+        ) ?? results[0]
+        setPcLoose(best.loosePrice)
+        setPcGraded(best.gradedPrice)
+        setPcUrl(best.url)
+      })
+      .catch(() => {})
   }, [cardName])
 
   // ── Price calcs ─────────────────────────────────────────────
@@ -255,7 +275,7 @@ export function CardAnalyticsPanel({
                   <h3 className="text-[10px] text-zinc-500 uppercase tracking-wide font-medium">
                     Price Breakdown
                   </h3>
-                  <SourceBadge label="pokemontcg.io + eBay" />
+                  <SourceBadge label="pokemontcg.io · eBay · PriceCharting" />
                 </div>
                 <div className="bg-zinc-900 rounded-xl border border-zinc-800 overflow-hidden">
                   {[
@@ -267,6 +287,8 @@ export function CardAnalyticsPanel({
                     { label: 'Cardmarket Trend', value: cmTrend,       color: 'text-zinc-400', prefix: '€'   },
                     { label: 'eBay Avg Sold',    value: ebayAvgSold,   color: 'text-blue-400', bold: true     },
                     { label: 'eBay Lowest Buy',  value: ebayLowestBuy, color: 'text-yellow-400'               },
+                    { label: 'PriceCharting Raw', value: pcLoose,      color: 'text-orange-400', bold: true   },
+                    { label: 'PriceCharting PSA', value: pcGraded,     color: 'text-orange-300'               },
                   ].filter(r => r.value != null).map((row, i, arr) => (
                     <div key={row.label}
                       className={`flex justify-between items-center px-4 py-2.5
@@ -277,12 +299,24 @@ export function CardAnalyticsPanel({
                       </span>
                     </div>
                   ))}
-                  {tcgMarket == null && ebayAvgSold == null && (
+                  {tcgMarket == null && ebayAvgSold == null && pcLoose == null && (
                     <div className="px-4 py-6 text-center text-xs text-zinc-600">
                       No price data available
                     </div>
                   )}
                 </div>
+                {pcUrl && (
+                  <a
+                    href={pcUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-2 flex items-center gap-1.5 text-[10px] text-orange-400/70
+                      hover:text-orange-400 transition-colors"
+                  >
+                    <ExternalLink className="w-3 h-3" />
+                    View full price history on PriceCharting →
+                  </a>
+                )}
               </div>
 
               {soldPrices.length >= 2 && (
