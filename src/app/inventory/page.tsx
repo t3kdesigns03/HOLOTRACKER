@@ -15,6 +15,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge'
 import { InventoryTableRow } from '@/components/inventory/InventoryTableRow'
 import { CardAnalyticsPanel } from '@/components/card/CardAnalyticsPanel'
 import { CardViewer } from '@/components/card/CardViewer'
+import { EditInventoryModal } from '@/components/inventory/EditInventoryModal'
 import {
   getMarketPrice, STATUS_COLORS, STATUS_LABELS,
   CONDITION_LABELS, PRINT_TYPE_LABELS,
@@ -68,6 +69,7 @@ export default function InventoryPage() {
   const [sortDesc,     setSortDesc]    = useState(true)
   const [viewerCard,    setViewerCard]    = useState<InventoryCard | null>(null)
   const [analyticsCard, setAnalyticsCard] = useState<InventoryCard | null>(null)
+  const [editCard,      setEditCard]      = useState<InventoryCard | null>(null)
 
   const fetchInventory = useCallback(async () => {
     setLoading(true)
@@ -398,7 +400,7 @@ export default function InventoryPage() {
       </div>
 
       {/* Fullscreen card viewer */}
-      {viewerCard && !analyticsCard && (
+      {viewerCard && !analyticsCard && !editCard && (
         <CardViewer
           imageUrl={viewerCard.card.image_url}
           imageUrlSmall={viewerCard.card.image_url_small}
@@ -410,6 +412,7 @@ export default function InventoryPage() {
           marketPrice={viewerCard.market_price}
           onClose={() => setViewerCard(null)}
           onViewAnalytics={() => setAnalyticsCard(viewerCard)}
+          onEdit={() => setEditCard(viewerCard)}
         />
       )}
 
@@ -423,9 +426,22 @@ export default function InventoryPage() {
           printType={analyticsCard.print_type as PrintType}
           setName={analyticsCard.card.set_name}
           cardNumber={analyticsCard.card.number}
-          tcgplayer={analyticsCard.card.tcgplayer_prices}
-          cardmarket={analyticsCard.card.cardmarket_prices}
+          tcgplayer={analyticsCard.card.tcgplayer_prices as import('@/types').TCGPlayerPrices | null}
+          cardmarket={analyticsCard.card.cardmarket_prices as import('@/types').CardmarketPrices | null}
           onClose={() => { setAnalyticsCard(null); setViewerCard(null) }}
+        />
+      )}
+
+      {/* Edit inventory modal */}
+      {editCard && (
+        <EditInventoryModal
+          card={editCard}
+          onClose={() => setEditCard(null)}
+          onSuccess={(updated) => {
+            setCards(prev => prev.map(c => c.id === updated.id ? computeInventoryCard(updated as never) : c))
+            setEditCard(null)
+            setViewerCard(null)
+          }}
         />
       )}
     </div>

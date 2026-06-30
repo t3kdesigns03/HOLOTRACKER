@@ -5,7 +5,7 @@
 // ============================================================
 
 import { useEffect } from 'react'
-import { X, BarChart2 } from 'lucide-react'
+import { X, BarChart2, Edit2 } from 'lucide-react'
 import { HoloCard } from './HoloCard'
 import type { PrintType } from '@/types'
 
@@ -20,6 +20,7 @@ interface CardViewerProps {
   marketPrice?: number | null
   onClose: () => void
   onViewAnalytics?: () => void
+  onEdit?: () => void
 }
 
 export function CardViewer({
@@ -33,6 +34,7 @@ export function CardViewer({
   marketPrice,
   onClose,
   onViewAnalytics,
+  onEdit,
 }: CardViewerProps) {
   // ESC to close
   useEffect(() => {
@@ -92,17 +94,32 @@ export function CardViewer({
           )}
         </div>
 
-        {/* Analytics CTA */}
-        {onViewAnalytics && (
-          <button
-            onClick={onViewAnalytics}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl
-              bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 hover:border-zinc-500
-              text-sm font-medium text-zinc-300 hover:text-white transition-all"
-          >
-            <BarChart2 className="w-4 h-4" />
-            View Analytics
-          </button>
+        {/* Action buttons */}
+        {(onViewAnalytics || onEdit) && (
+          <div className="flex items-center gap-2">
+            {onEdit && (
+              <button
+                onClick={onEdit}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl
+                  bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 hover:border-zinc-500
+                  text-sm font-medium text-zinc-300 hover:text-white transition-all"
+              >
+                <Edit2 className="w-4 h-4" />
+                Edit
+              </button>
+            )}
+            {onViewAnalytics && (
+              <button
+                onClick={onViewAnalytics}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl
+                  bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 hover:border-zinc-500
+                  text-sm font-medium text-zinc-300 hover:text-white transition-all"
+              >
+                <BarChart2 className="w-4 h-4" />
+                View Analytics
+              </button>
+            )}
+          </div>
         )}
       </div>
     </div>
