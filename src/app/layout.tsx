@@ -6,7 +6,7 @@ import { Toaster } from 'sonner'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'HoloTracker — Pokémon TCG Inventory',
+  title: 'HOLOTrakr — Pokémon TCG Inventory',
   description: 'Track your Pokémon TCG collection, prices, and profits',
 }
 

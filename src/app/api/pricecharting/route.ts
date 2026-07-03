@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
       `https://www.pricecharting.com/api/products?q=${encodeURIComponent(q)}&id=pokemon`
 
     const res = await fetch(url, {
-      headers: { 'User-Agent': 'HoloTracker/1.0' },
+      headers: { 'User-Agent': 'HOLOTrakr/1.0' },
       next: { revalidate: 600 },  // 10-min cache
     })
 

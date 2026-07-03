@@ -25,7 +25,7 @@ export function Nav() {
   return (
     <nav className="h-14 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur sticky top-0 z-40 flex items-center px-4 gap-6">
       <Link href="/inventory" className="font-bold text-white text-lg flex items-center gap-2 mr-4">
-        🃏 <span className="text-purple-400">Holo</span>Tracker
+        🃏 <span className="text-purple-400">HOLO</span>Trakr
       </Link>
       <div className="flex items-center gap-1 flex-1">
         {links.map(({ href, label, icon: Icon }) => (

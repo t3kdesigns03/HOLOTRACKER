@@ -357,7 +357,7 @@ export default function HeroSection() {
             <p className="ht-eyebrow">Pokémon TCG</p>
             <div className="ht-title-wrap">
               <div className="ht-glow-bg" />
-              <h1 className="ht-title">HoloTracker</h1>
+              <h1 className="ht-title">HOLOTrakr</h1>
               <div className="ht-shimmer" />
             </div>
             <p className="ht-sub">

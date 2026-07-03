@@ -179,7 +179,7 @@ export function OnboardingModal() {
                 className="text-[28px] font-extrabold tracking-tight"
                 style={{ background: 'linear-gradient(130deg,#fff 0%,#c084fc 60%,#a855f7 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', animation: 'htGlowPulse 3s ease-in-out infinite alternate' }}
               >
-                Welcome to HoloTracker
+                Welcome to HOLOTrakr
               </h1>
               <p className="text-sm text-zinc-500 mt-1.5">
                 One quick step — set up your collector profile

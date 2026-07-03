@@ -28,7 +28,7 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const { short_code } = await params
   const data = await fetchCase(short_code)
-  if (!data?.card) return { title: 'HoloCase — HoloTracker' }
+  if (!data?.card) return { title: 'HoloCase — HOLOTrakr' }
   return {
     title: `${data.card.name} · ${data.card.set_name} — HoloCase`,
     description: `${data.card.name} (${data.card.set_name} ${data.card.number}) in a HoloCase protective case.`,
@@ -51,7 +51,7 @@ export default async function PublicCasePage(
           This HoloCase doesn&apos;t exist or its owner has set it to private.
         </p>
         <Link href="/" className="text-purple-400 text-sm hover:underline">
-          What is HoloTracker?
+          What is HOLOTrakr?
         </Link>
       </main>
     )
@@ -75,7 +75,7 @@ export default async function PublicCasePage(
       {/* Header */}
       <header className="flex items-center justify-between">
         <span className="font-bold text-lg">
-          🃏 <span className="text-purple-400">Holo</span>Tracker
+          🃏 <span className="text-purple-400">HOLO</span>Trakr
         </span>
         <span className="font-mono text-xs text-zinc-500 border border-zinc-800 rounded-md px-2 py-1">
           {data.short_code}
@@ -189,7 +189,7 @@ export default async function PublicCasePage(
 
       <footer className="mt-auto pt-6 text-center text-xs text-zinc-600">
         Protected by a <span className="text-zinc-400">HoloCase</span> · tracked with{' '}
-        <Link href="/" className="text-purple-400/80 hover:underline">HoloTracker</Link>
+        <Link href="/" className="text-purple-400/80 hover:underline">HOLOTrakr</Link>
       </footer>
     </main>
   )

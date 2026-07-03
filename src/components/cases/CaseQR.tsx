@@ -150,7 +150,7 @@ function labelHtml(shortCode: string, qrDataUrl: string, cardName?: string | nul
     <img src="${qrDataUrl}" alt="QR" />
     <div class="code">${shortCode}</div>
     ${cardName ? `<div class="name">${escapeHtml(cardName)}</div>` : ''}
-    <div class="brand">HoloCase &middot; HoloTracker</div>
+    <div class="brand">HoloCase &middot; HOLOTrakr</div>
   </div>
 </body>
 </html>`
