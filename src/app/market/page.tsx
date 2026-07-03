@@ -8,6 +8,8 @@ import { useState, useCallback, useEffect } from 'react'
 import { Search, TrendingUp, Zap, Star, Loader2 } from 'lucide-react'
 import { HoloCard } from '@/components/card/HoloCard'
 import { CardAnalyticsPanel } from '@/components/card/CardAnalyticsPanel'
+import { AddToInventoryModal } from '@/components/inventory/AddToInventoryModal'
+import { toast } from 'sonner'
 import type { PokemonCardAPI } from '@/types'
 
 // Curated cards to show as "trending" — covers classics + current chase cards
@@ -42,6 +44,7 @@ export default function MarketPage() {
   const [trendingLoaded, setTrendingLoaded] = useState(false)
   const [trendingLoading,setTrendingLoading]= useState(false)
   const [selectedCard,   setSelectedCard]   = useState<PokemonCardAPI | null>(null)
+  const [addCard,        setAddCard]        = useState<PokemonCardAPI | null>(null)
 
   // Load trending cards on demand
   const loadTrending = useCallback(async () => {
@@ -271,6 +274,20 @@ export default function MarketPage() {
           tcgplayer={selectedCard.tcgplayer}
           cardmarket={selectedCard.cardmarket}
           onClose={() => setSelectedCard(null)}
+          onAddToInventory={() => setAddCard(selectedCard)}
+        />
+      )}
+
+      {/* Add to inventory (from HoloDex search) */}
+      {addCard && (
+        <AddToInventoryModal
+          card={addCard}
+          onClose={() => setAddCard(null)}
+          onSuccess={() => {
+            toast.success(`${addCard.name} added to your inventory`)
+            setAddCard(null)
+            setSelectedCard(null)
+          }}
         />
       )}
     </div>

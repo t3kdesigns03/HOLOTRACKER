@@ -23,11 +23,23 @@ export async function searchCards(params: CardSearchParams): Promise<CardSearchR
 
   if (q) {
     const words = q.trim().split(/\s+/).filter(Boolean)
-    // If the last word is a pure number, treat it as a card number filter
-    const lastWord = words[words.length - 1]
-    const isNumber = /^\d+$/.test(lastWord)
-    const nameWords = isNumber ? words.slice(0, -1) : words
-    const cardNumber = isNumber ? lastWord : null
+
+    // Recognize card-number tokens anywhere in the query:
+    //   "125/094"  → number 125 (printed "125 of 094")
+    //   "TG12/TG30" → number TG12 (trainer gallery / promo prefixes)
+    //   "#125"     → number 125
+    //   trailing "125" → number 125 (legacy behavior)
+    const nameWords: string[] = []
+    let cardNumber: string | null = null
+    words.forEach((word, i) => {
+      const slashMatch = word.match(/^#?([A-Za-z]{0,4}\d+[a-z]?)\/[A-Za-z]{0,4}\d+$/)
+      const hashMatch  = word.match(/^#([A-Za-z]{0,4}\d+[a-z]?)$/)
+      const isTrailingNumber = i === words.length - 1 && /^\d+$/.test(word)
+      if (slashMatch)           cardNumber = slashMatch[1]
+      else if (hashMatch)       cardNumber = hashMatch[1]
+      else if (isTrailingNumber) cardNumber = word
+      else nameWords.push(word)
+    })
 
     if (nameWords.length > 0) {
       if (nameWords.length === 1) {
@@ -40,7 +52,15 @@ export async function searchCards(params: CardSearchParams): Promise<CardSearchR
         queryParts.push(`name:"${nameWords.join(' ')}"`)
       }
     }
-    if (cardNumber) queryParts.push(`number:${cardNumber}`)
+    if (cardNumber) {
+      // Sets vary on leading zeros ("049" vs "49") — match either
+      const stripped = (cardNumber as string).replace(/^([A-Za-z]*)0+(\d)/, '$1$2')
+      queryParts.push(
+        stripped !== cardNumber
+          ? `(number:${cardNumber} OR number:${stripped})`
+          : `number:${cardNumber}`
+      )
+    }
   }
 
   if (set)       queryParts.push(`set.id:${set}`)

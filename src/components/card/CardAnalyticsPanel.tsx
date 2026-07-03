@@ -5,7 +5,7 @@
 // ============================================================
 
 import { useState, useEffect } from 'react'
-import { X, ExternalLink, MapPin, TrendingUp, TrendingDown, Minus, Globe } from 'lucide-react'
+import { X, ExternalLink, MapPin, TrendingUp, TrendingDown, Minus, Globe, Plus } from 'lucide-react'
 import { HoloCard } from '@/components/card/HoloCard'
 import type { EbayListing, EbaySoldListing, PrintType, TCGPlayerPrices, CardmarketPrices } from '@/types'
 
@@ -86,6 +86,8 @@ interface Props {
   tcgplayer?: TCGPlayerPrices | null
   cardmarket?: CardmarketPrices | null
   onClose: () => void
+  /** When provided, shows an "Add to Inventory" action (used by HoloDex search) */
+  onAddToInventory?: () => void
 }
 
 type TabId = 'overview' | 'regional' | 'ebay-buy' | 'ebay-sold'
@@ -93,7 +95,7 @@ type TabId = 'overview' | 'regional' | 'ebay-buy' | 'ebay-sold'
 // ── Component ───────────────────────────────────────────────────
 export function CardAnalyticsPanel({
   cardName, imageUrl, imageUrlSmall, rarity, printType,
-  setName, cardNumber, tcgplayer, cardmarket, onClose,
+  setName, cardNumber, tcgplayer, cardmarket, onClose, onAddToInventory,
 }: Props) {
   const [listings,  setListings]  = useState<EbayListing[]>([])
   const [sold,      setSold]      = useState<EbaySoldListing[]>([])
@@ -244,6 +246,16 @@ export function CardAnalyticsPanel({
                 </div>
               )}
             </div>
+
+            {onAddToInventory && (
+              <button
+                onClick={onAddToInventory}
+                className="mt-4 w-full flex items-center justify-center gap-2 rounded-xl
+                  bg-purple-600 hover:bg-purple-500 py-2.5 text-sm font-semibold text-white transition-colors"
+              >
+                <Plus className="w-4 h-4" /> Add to Inventory
+              </button>
+            )}
           </div>
         </div>
 
