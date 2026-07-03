@@ -25,19 +25,24 @@ export async function searchCards(params: CardSearchParams): Promise<CardSearchR
     const words = q.trim().split(/\s+/).filter(Boolean)
 
     // Recognize card-number tokens anywhere in the query:
-    //   "125/094"  → number 125 (printed "125 of 094")
+    //   "125/094"   → number 125 (printed "125 of 094")
     //   "TG12/TG30" → number TG12 (trainer gallery / promo prefixes)
-    //   "#125"     → number 125
-    //   trailing "125" → number 125 (legacy behavior)
+    //   "#125"      → number 125
+    //   trailing "125"   → number 125 (legacy behavior)
+    //   trailing "xy124" → number XY124 (promo numbers — needs a name word too,
+    //                      so "Porygon2" alone stays a name search)
     const nameWords: string[] = []
     let cardNumber: string | null = null
     words.forEach((word, i) => {
+      const isLast = i === words.length - 1
       const slashMatch = word.match(/^#?([A-Za-z]{0,4}\d+[a-z]?)\/[A-Za-z]{0,4}\d+$/)
       const hashMatch  = word.match(/^#([A-Za-z]{0,4}\d+[a-z]?)$/)
-      const isTrailingNumber = i === words.length - 1 && /^\d+$/.test(word)
-      if (slashMatch)           cardNumber = slashMatch[1]
-      else if (hashMatch)       cardNumber = hashMatch[1]
+      const isTrailingNumber = isLast && /^\d+$/.test(word)
+      const isTrailingPromo  = isLast && words.length > 1 && /^[A-Za-z]{1,5}\d+[a-z]?$/.test(word)
+      if (slashMatch)            cardNumber = slashMatch[1]
+      else if (hashMatch)        cardNumber = hashMatch[1]
       else if (isTrailingNumber) cardNumber = word
+      else if (isTrailingPromo)  cardNumber = word
       else nameWords.push(word)
     })
 
