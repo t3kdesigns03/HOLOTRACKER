@@ -8,7 +8,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import {
-  getMarketPrice, CONDITION_LABELS, PRINT_TYPE_LABELS,
+  getMarketPrice, getJustTCGPrice, CONDITION_LABELS, PRINT_TYPE_LABELS,
   type PublicCaseData, type PrintType, type CardCondition,
 } from '@/types'
 
@@ -57,9 +57,18 @@ export default async function PublicCasePage(
     )
   }
 
-  const marketPrice = data.prices && data.print_type
-    ? getMarketPrice(data.prices, data.print_type)
+  // Prefer JustTCG condition-aware price; fall back to TCGplayer market (NM-ish)
+  const jtPrice = data.print_type && data.condition
+    ? getJustTCGPrice(data.justtcg_variants, data.print_type as PrintType, data.condition as CardCondition)
     : null
+  const marketPrice = jtPrice?.price ?? (
+    data.prices && data.print_type
+      ? getMarketPrice(data.prices, data.print_type as PrintType)
+      : null
+  )
+  const priceSource = jtPrice
+    ? `${data.condition} · JustTCG`
+    : 'TCGplayer market'
 
   return (
     <main className="min-h-dvh max-w-md mx-auto px-4 py-8 flex flex-col gap-6">
@@ -149,7 +158,12 @@ export default async function PublicCasePage(
                 <span className="text-sm text-zinc-400">Est. value</span>
                 <span className="text-base font-bold text-purple-300">
                   ${marketPrice.toFixed(2)}
-                  <span className="text-xs font-normal text-zinc-500 ml-1.5">TCGplayer market</span>
+                  <span className="text-xs font-normal text-zinc-500 ml-1.5">{priceSource}</span>
+                  {jtPrice?.change24h != null && jtPrice.change24h !== 0 && (
+                    <span className={`text-xs font-medium ml-1.5 ${jtPrice.change24h > 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                      {jtPrice.change24h > 0 ? '▲' : '▼'} {Math.abs(jtPrice.change24h).toFixed(2)}
+                    </span>
+                  )}
                 </span>
               </div>
             )}

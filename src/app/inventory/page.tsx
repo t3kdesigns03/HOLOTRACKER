@@ -16,10 +16,12 @@ import { InventoryTableRow } from '@/components/inventory/InventoryTableRow'
 import { CardAnalyticsPanel } from '@/components/card/CardAnalyticsPanel'
 import { CardViewer } from '@/components/card/CardViewer'
 import { EditInventoryModal } from '@/components/inventory/EditInventoryModal'
+import { RefreshPricesButton } from '@/components/inventory/RefreshPricesButton'
 import {
-  getMarketPrice, STATUS_COLORS, STATUS_LABELS,
+  getMarketPrice, getJustTCGPrice, STATUS_COLORS, STATUS_LABELS,
   CONDITION_LABELS, PRINT_TYPE_LABELS,
-  type InventoryCard, type CardStatus, type PrintType
+  type InventoryCard, type CardStatus, type PrintType,
+  type CardCondition, type JustTCGVariant,
 } from '@/types'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
@@ -41,14 +43,22 @@ function computeInventoryCard(raw: {
     name: string; set_name: string; number: string; rarity?: string | null
     image_url: string | null; image_url_small: string | null
     tcgplayer_prices?: unknown
+    justtcg_variants?: unknown
   }
   print_type: string
+  condition: string
   quantity: number
   cost_basis: number | null
   [key: string]: unknown
 }): InventoryCard {
   const card = raw as unknown as InventoryCard
-  const mp = getMarketPrice(
+  // Prefer JustTCG condition-aware price; fall back to TCGplayer market
+  const jt = getJustTCGPrice(
+    (raw.card.justtcg_variants ?? null) as JustTCGVariant[] | null,
+    raw.print_type as PrintType,
+    raw.condition as CardCondition
+  )
+  const mp = jt?.price ?? getMarketPrice(
     (raw.card.tcgplayer_prices ?? null) as Parameters<typeof getMarketPrice>[0],
     raw.print_type as Parameters<typeof getMarketPrice>[1]
   )
@@ -230,8 +240,13 @@ export default function InventoryPage() {
             ))}
           </div>
 
+          {/* Price refresh (JustTCG) */}
+          <div className="ml-auto">
+            <RefreshPricesButton onRefreshed={fetchInventory} />
+          </div>
+
           {/* View toggle */}
-          <div className="flex items-center gap-1 bg-zinc-900 border border-zinc-800 rounded-lg p-1 ml-auto">
+          <div className="flex items-center gap-1 bg-zinc-900 border border-zinc-800 rounded-lg p-1">
             <button
               onClick={() => setView('table')}
               className={cn(

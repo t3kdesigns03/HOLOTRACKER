@@ -53,12 +53,18 @@ export default function MarketPage() {
       await Promise.all(
         TRENDING_CARDS.map(async name => {
           try {
-            const sp = new URLSearchParams({ q: name, pageSize: '1', page: '1' })
+            const sp = new URLSearchParams({ q: name, pageSize: '8', page: '1' })
             const res = await fetch(`/api/cards/search?${sp}`)
             if (!res.ok) return
             const data = await res.json()
-            const card: PokemonCardAPI | undefined = data.data?.[0]
-            if (card) results.push({ card, marketPrice: getMarketPrice(card) })
+            const cards: PokemonCardAPI[] = data.data ?? []
+            if (!cards.length) return
+            // Results are newest-first; brand-new sets often have no price
+            // data yet. Prefer the highest-priced printing of this card.
+            const best = cards
+              .map(card => ({ card, marketPrice: getMarketPrice(card) }))
+              .sort((a, b) => (b.marketPrice ?? -1) - (a.marketPrice ?? -1))[0]
+            results.push(best)
           } catch { /* skip */ }
         })
       )

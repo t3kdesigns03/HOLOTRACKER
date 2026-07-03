@@ -17,7 +17,12 @@ export async function GET(req: NextRequest) {
   try {
     const result = await searchCards({ q, set, supertype, rarity, page, pageSize })
     return NextResponse.json(result, {
-      headers: { 'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=300' }
+      headers: {
+        'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=300',
+        // Netlify's CDN does NOT vary cached responses by query string unless
+        // told to — without this, every search returns the first cached result.
+        'Netlify-Vary': 'query',
+      }
     })
   } catch (err) {
     console.error('Card search error:', err)

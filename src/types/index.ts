@@ -228,6 +228,8 @@ export interface PublicCaseData {
   } | null
   prices?: TCGPlayerPrices | null
   price_updated_at?: string | null
+  justtcg_variants?: JustTCGVariant[] | null
+  justtcg_updated_at?: string | null
   // Owner-only fields
   id?: string
   user_card_id?: string | null
