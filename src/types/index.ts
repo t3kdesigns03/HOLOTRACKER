@@ -148,8 +148,68 @@ export interface UserCardRow {
   grading_company: GradingCompany | null
   grade: string | null
   cert_number: string | null
+  tags: string[]
   created_at: string
   updated_at: string
+}
+
+export interface CaseRow {
+  id: string
+  user_id: string
+  short_code: string
+  user_card_id: string | null
+  location: string | null
+  notes: string | null
+  is_public: boolean
+  show_value: boolean
+  show_grade: boolean
+  show_notes: boolean
+  show_tags: boolean
+  created_at: string
+  updated_at: string
+}
+
+/** CaseRow joined with its assigned inventory item (+ cached card) */
+export interface CaseWithCard extends CaseRow {
+  user_card: (UserCardRow & { card: PokemonCardRow }) | null
+}
+
+/** Shape returned by the get_public_case() RPC */
+export interface PublicCaseData {
+  short_code: string
+  is_owner: boolean
+  case_notes: string | null
+  created_at: string
+  card?: {
+    id: string
+    name: string
+    set_name: string
+    set_series: string | null
+    set_symbol_url: string | null
+    number: string
+    rarity: string | null
+    image_url: string | null
+    image_url_small: string | null
+  }
+  print_type?: PrintType
+  condition?: CardCondition
+  tags?: string[] | null
+  grading?: {
+    company: GradingCompany | null
+    grade: string | null
+    cert_number: string | null
+  } | null
+  prices?: TCGPlayerPrices | null
+  price_updated_at?: string | null
+  // Owner-only fields
+  id?: string
+  user_card_id?: string | null
+  location?: string | null
+  is_public?: boolean
+  show_value?: boolean
+  show_grade?: boolean
+  show_notes?: boolean
+  show_tags?: boolean
 }
 
 export interface SaleLogRow {
