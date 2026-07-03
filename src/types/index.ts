@@ -112,8 +112,35 @@ export interface PokemonCardRow {
   tcgplayer_prices: TCGPlayerPrices | null
   cardmarket_prices: CardmarketPrices | null
   price_updated_at: string | null
+  justtcg_card_id: string | null
+  justtcg_variants: JustTCGVariant[] | null
+  justtcg_updated_at: string | null
   raw_data: PokemonCardAPI | null
   created_at: string
+}
+
+// ── JustTCG Types ────────────────────────────────────────────
+
+export interface JustTCGVariant {
+  id: string
+  uuid?: string
+  condition: string        // "Near Mint" | "Lightly Played" | …
+  printing: string         // "Normal" | "Holofoil" | "Reverse Holofoil" | …
+  price: number
+  priceChange24hr?: number
+  lastUpdated?: number     // unix seconds
+}
+
+export interface JustTCGCard {
+  id: string
+  uuid?: string
+  name: string
+  game: string
+  set: string
+  set_name: string
+  rarity?: string | null
+  tcgplayerId?: string | null
+  variants: JustTCGVariant[]
 }
 
 export type CardCondition = 'NM' | 'LP' | 'MP' | 'HP' | 'DMG'
@@ -410,6 +437,55 @@ export function getMarketPrice(
     case 'firstEdition':    return p['1stEditionHolofoil']?.market ?? p['1stEdition']?.market ?? null
     default:                return p.normal?.market ?? null
   }
+}
+
+/** Our condition codes → JustTCG condition labels */
+export const JUSTTCG_CONDITION_NAMES: Record<CardCondition, string> = {
+  NM:  'Near Mint',
+  LP:  'Lightly Played',
+  MP:  'Moderately Played',
+  HP:  'Heavily Played',
+  DMG: 'Damaged',
+}
+
+/** Our print_type → acceptable JustTCG printing labels, in preference order */
+export const JUSTTCG_PRINTING_CANDIDATES: Record<PrintType, string[]> = {
+  normal:          ['Normal', 'Unlimited'],
+  holofoil:        ['Holofoil', 'Foil', 'Unlimited Holofoil'],
+  reverseHolofoil: ['Reverse Holofoil'],
+  firstEdition:    ['1st Edition Holofoil', '1st Edition'],
+  shadowless:      ['Shadowless', 'Normal'],
+  fullArt:         ['Holofoil', 'Normal'],
+  altArt:          ['Holofoil', 'Normal'],
+  promo:           ['Normal', 'Holofoil'],
+  other:           [],
+}
+
+/**
+ * Pick the condition-aware price from cached JustTCG variants.
+ * Returns null when nothing matches — callers should fall back to
+ * getMarketPrice() (the TCGplayer market snapshot, NM-agnostic).
+ */
+export function getJustTCGPrice(
+  variants: JustTCGVariant[] | null | undefined,
+  printType: PrintType,
+  condition: CardCondition
+): { price: number; change24h: number | null; printing: string } | null {
+  if (!variants?.length) return null
+  const wantCondition = JUSTTCG_CONDITION_NAMES[condition]
+  const candidates = JUSTTCG_PRINTING_CANDIDATES[printType] ?? []
+
+  const pool = variants.filter(v => v.condition === wantCondition && v.price != null)
+  if (!pool.length) return null
+
+  for (const printing of candidates) {
+    const hit = pool.find(v => v.printing === printing)
+    if (hit) return { price: hit.price, change24h: hit.priceChange24hr ?? null, printing: hit.printing }
+  }
+  // Unknown printing mapping — only safe if there's exactly one option
+  return pool.length === 1
+    ? { price: pool[0].price, change24h: pool[0].priceChange24hr ?? null, printing: pool[0].printing }
+    : null
 }
 
 /** Determine if a card is holographic based on rarity / print type */
