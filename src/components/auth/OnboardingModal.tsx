@@ -11,6 +11,7 @@ import { Loader2, Check, X, User, AtSign, Eye, EyeOff } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { HeroHoloCard, fetchRandomCard, type HeroCardData } from '@/components/card/HeroHoloCard'
+import { BrandWordmark } from '@/components/ui/BrandWordmark'
 
 const USERNAME_RE = /^[a-z0-9_-]{3,24}$/
 
@@ -175,11 +176,8 @@ export function OnboardingModal() {
           <div className="w-full max-w-sm">
 
             <div className="text-center mb-8">
-              <h1
-                className="text-[28px] font-extrabold tracking-tight"
-                style={{ background: 'linear-gradient(130deg,#fff 0%,#c084fc 60%,#a855f7 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', animation: 'htGlowPulse 3s ease-in-out infinite alternate' }}
-              >
-                Welcome to HOLOTrakr
+              <h1 className="text-[26px] tracking-tight text-white font-extrabold">
+                Welcome to <BrandWordmark />
               </h1>
               <p className="text-sm text-zinc-500 mt-1.5">
                 One quick step — set up your collector profile

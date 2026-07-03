@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState, useCallback } from "react"
+import { BrandWordmark } from "@/components/ui/BrandWordmark"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface CardData {
@@ -318,7 +319,8 @@ export default function HeroSection() {
 
         .ht-eyebrow { font-family:system-ui,sans-serif; font-size:11px; font-weight:600; letter-spacing:.36em; color:rgba(168,85,247,.78); text-transform:uppercase; margin:0 0 16px; text-shadow:0 0 18px rgba(168,85,247,.6); }
         .ht-title-wrap { position:relative; display:inline-block; }
-        .ht-glow-bg { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:118%; height:220%; background:radial-gradient(ellipse at center,rgba(110,40,255,.22) 0%,rgba(60,0,180,.08) 50%,transparent 70%); pointer-events:none; filter:blur(18px); }
+        .ht-glow-bg { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:118%; height:220%; background:radial-gradient(ellipse at center,rgba(40,140,255,.20) 0%,rgba(110,40,255,.10) 50%,transparent 70%); pointer-events:none; filter:blur(18px); }
+        h1.ht-brand-title { font-family:system-ui,sans-serif; font-size:clamp(46px,8vw,92px); line-height:1; margin:0; position:relative; }
         h1.ht-title { font-family:system-ui,sans-serif; font-size:clamp(46px,8vw,92px); font-weight:800; letter-spacing:-.025em; line-height:1; margin:0; position:relative; background:linear-gradient(130deg,#fff 0%,#ede0ff 22%,#c084fc 48%,#a855f7 64%,#7c3aed 80%,#c084fc 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; animation:htGlowPulse 3s ease-in-out infinite alternate; }
         .ht-shimmer { position:absolute; inset:0; pointer-events:none; background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.2) 50%,transparent 62%); background-size:200% 100%; animation:htShimmer 4.5s ease-in-out 1s infinite; -webkit-background-clip:text; background-clip:text; }
         .ht-sub { font-family:system-ui,sans-serif; font-size:clamp(14px,1.8vw,17px); font-weight:400; color:rgba(200,178,255,.62); margin:18px 0 0; line-height:1.6; max-width:420px; text-shadow:0 0 28px rgba(160,100,255,.25); }
@@ -357,8 +359,9 @@ export default function HeroSection() {
             <p className="ht-eyebrow">Pokémon TCG</p>
             <div className="ht-title-wrap">
               <div className="ht-glow-bg" />
-              <h1 className="ht-title">HOLOTrakr</h1>
-              <div className="ht-shimmer" />
+              <h1 className="ht-brand-title">
+                <BrandWordmark interactive />
+              </h1>
             </div>
             <p className="ht-sub">
               Track every pull. Know every value.<br />

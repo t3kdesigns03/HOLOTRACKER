@@ -7,6 +7,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
+import { BrandWordmark } from '@/components/ui/BrandWordmark'
 import {
   getMarketPrice, getJustTCGPrice, CONDITION_LABELS, PRINT_TYPE_LABELS,
   type PublicCaseData, type PrintType, type CardCondition,
@@ -75,7 +76,7 @@ export default async function PublicCasePage(
       {/* Header */}
       <header className="flex items-center justify-between">
         <span className="font-bold text-lg">
-          🃏 <span className="text-purple-400">HOLO</span>Trakr
+          🃏 <BrandWordmark />
         </span>
         <span className="font-mono text-xs text-zinc-500 border border-zinc-800 rounded-md px-2 py-1">
           {data.short_code}

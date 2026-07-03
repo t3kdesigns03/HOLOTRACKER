@@ -20,6 +20,8 @@ interface Props {
   onClose: () => void
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onSuccess: (updated: any) => void
+  /** Optional: opens the remove-confirmation flow (closes this modal first) */
+  onRequestRemove?: () => void
 }
 
 const CONDITIONS: CardCondition[] = ['NM', 'LP', 'MP', 'HP', 'DMG']
@@ -44,7 +46,7 @@ function toForm(card: InventoryCard): AddCardForm {
   }
 }
 
-export function EditInventoryModal({ card, onClose, onSuccess }: Props) {
+export function EditInventoryModal({ card, onClose, onSuccess, onRequestRemove }: Props) {
   const [form, setForm]             = useState<AddCardForm>(() => toForm(card))
   const [saving, setSaving]         = useState(false)
   const [error, setError]           = useState<string | null>(null)
@@ -365,7 +367,17 @@ export function EditInventoryModal({ card, onClose, onSuccess }: Props) {
             </div>
           )}
 
-          <div className="flex gap-2 mt-5">
+          {onRequestRemove && (
+            <button
+              type="button"
+              onClick={onRequestRemove}
+              className="mt-5 flex items-center gap-1.5 text-xs text-red-400/70 hover:text-red-400 transition-colors"
+            >
+              <X className="w-3.5 h-3.5" /> Remove this card from inventory…
+            </button>
+          )}
+
+          <div className="flex gap-2 mt-3">
             <button type="button" onClick={onClose}
               className="flex-1 px-4 py-2.5 rounded-xl bg-zinc-800 border border-zinc-700
                 text-zinc-400 text-sm font-medium hover:bg-zinc-700 hover:text-white transition-colors">

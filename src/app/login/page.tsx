@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
 import { HeroHoloCard, fetchRandomCard, type HeroCardData } from '@/components/card/HeroHoloCard'
+import { BrandWordmark } from '@/components/ui/BrandWordmark'
 
 // ─── Login form ───────────────────────────────────────────────────────────────
 function LoginForm() {
@@ -120,8 +121,8 @@ function LoginForm() {
         <div className="ht-form-col">
           <div style={{ width: '100%', maxWidth: 340 }}>
             <div style={{ textAlign: 'center', marginBottom: 32 }}>
-              <h1 style={{ fontSize: 28, fontWeight: 800, color: '#fff', fontFamily: 'system-ui,sans-serif', margin: '0 0 6px', background: 'linear-gradient(130deg,#fff 0%,#c084fc 60%,#a855f7 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', animation: 'htGlowPulse 3s ease-in-out infinite alternate' }}>
-                HOLOTrakr
+              <h1 style={{ fontSize: 28, fontFamily: 'system-ui,sans-serif', margin: '0 0 6px' }}>
+                <BrandWordmark />
               </h1>
               <p style={{ color: 'rgba(160,140,200,.5)', fontSize: 13, fontFamily: 'system-ui,sans-serif', margin: 0 }}>
                 {mode === 'signup' ? 'Create your account' : 'Welcome back'}

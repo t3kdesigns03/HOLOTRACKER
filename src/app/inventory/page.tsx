@@ -17,6 +17,8 @@ import { CardAnalyticsPanel } from '@/components/card/CardAnalyticsPanel'
 import { CardViewer } from '@/components/card/CardViewer'
 import { EditInventoryModal } from '@/components/inventory/EditInventoryModal'
 import { RefreshPricesButton } from '@/components/inventory/RefreshPricesButton'
+import { ConfirmRemoveDialog } from '@/components/inventory/ConfirmRemoveDialog'
+import { Trash2 } from 'lucide-react'
 import {
   getMarketPrice, getJustTCGPrice, STATUS_COLORS, STATUS_LABELS,
   CONDITION_LABELS, PRINT_TYPE_LABELS,
@@ -80,6 +82,7 @@ export default function InventoryPage() {
   const [viewerCard,    setViewerCard]    = useState<InventoryCard | null>(null)
   const [analyticsCard, setAnalyticsCard] = useState<InventoryCard | null>(null)
   const [editCard,      setEditCard]      = useState<InventoryCard | null>(null)
+  const [removeCard,    setRemoveCard]    = useState<InventoryCard | null>(null)
 
   const fetchInventory = useCallback(async () => {
     setLoading(true)
@@ -139,17 +142,15 @@ export default function InventoryPage() {
     else { setSortKey(key); setSortDesc(true) }
   }
 
-  async function handleDelete(cardId: string) {
-    const prev = cards
-    setCards(c => c.filter(x => x.id !== cardId))
-    try {
-      const res = await fetch(`/api/inventory/${cardId}`, { method: 'DELETE' })
-      if (!res.ok) throw new Error()
-      toast.success('Card removed')
-    } catch {
-      setCards(prev)
-      toast.error('Failed to remove card')
+  // Called by ConfirmRemoveDialog after the API call succeeds.
+  // updated === null → row fully removed; otherwise quantity was decremented.
+  function handleRemoved(id: string, updated: InventoryCard | null) {
+    if (updated === null) {
+      setCards(c => c.filter(x => x.id !== id))
+    } else {
+      setCards(prev => prev.map(c => (c.id === id ? computeInventoryCard(updated as never) : c)))
     }
+    setViewerCard(null)
   }
 
   const plColor = (pl: number | null) =>
@@ -339,7 +340,8 @@ export default function InventoryPage() {
                   <InventoryTableRow
                     key={card.id}
                     card={card}
-                    onDelete={handleDelete}
+                    onRequestRemove={setRemoveCard}
+                    onEdit={setEditCard}
                     onRefresh={fetchInventory}
                   />
                 ))}
@@ -352,10 +354,21 @@ export default function InventoryPage() {
         {!loading && filtered.length > 0 && view === 'grid' && (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
             {filtered.map(card => (
+              <div key={card.id} className="relative group">
+                {/* Quick remove — always visible on touch, hover-reveal on desktop */}
+                <button
+                  onClick={() => setRemoveCard(card)}
+                  title="Remove from inventory"
+                  className="absolute top-2 right-2 z-10 p-1.5 rounded-lg
+                    bg-zinc-950/80 border border-zinc-700 text-zinc-500
+                    hover:text-red-400 hover:border-red-500/50
+                    opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
               <button
-                key={card.id}
                 onClick={() => setViewerCard(card)}
-                className="group flex flex-col items-center gap-2 p-3 rounded-xl
+                className="w-full flex flex-col items-center gap-2 p-3 rounded-xl
                   bg-zinc-900/50 border border-zinc-800 hover:border-purple-500/40
                   hover:bg-zinc-900 transition-all duration-200 text-center"
               >
@@ -399,6 +412,7 @@ export default function InventoryPage() {
                   </div>
                 </div>
               </button>
+              </div>
             ))}
           </div>
         )}
@@ -457,6 +471,19 @@ export default function InventoryPage() {
             setEditCard(null)
             setViewerCard(null)
           }}
+          onRequestRemove={() => {
+            setRemoveCard(editCard)
+            setEditCard(null)
+          }}
+        />
+      )}
+
+      {/* Remove confirmation */}
+      {removeCard && (
+        <ConfirmRemoveDialog
+          card={removeCard}
+          onClose={() => setRemoveCard(null)}
+          onRemoved={updated => handleRemoved(removeCard.id, updated)}
         />
       )}
     </div>

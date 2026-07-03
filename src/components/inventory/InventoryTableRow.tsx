@@ -13,11 +13,14 @@ import { RecordSaleModal } from './RecordSaleModal'
 
 interface Props {
   card: InventoryCard
-  onDelete: (id: string) => void
+  /** Opens the themed remove-confirmation dialog */
+  onRequestRemove: (card: InventoryCard) => void
+  /** Opens the edit modal */
+  onEdit: (card: InventoryCard) => void
   onRefresh: () => void
 }
 
-export function InventoryTableRow({ card, onDelete, onRefresh }: Props) {
+export function InventoryTableRow({ card, onRequestRemove, onEdit, onRefresh }: Props) {
   const [showMenu,    setShowMenu]    = useState(false)
   const [showSellModal, setShowSellModal] = useState(false)
 
@@ -132,8 +135,8 @@ export function InventoryTableRow({ card, onDelete, onRefresh }: Props) {
           <div className="relative">
             <button
               onClick={() => setShowMenu(v => !v)}
-              className="p-1.5 rounded-lg text-zinc-700 hover:text-zinc-300 hover:bg-zinc-700
-                transition-colors opacity-0 group-hover:opacity-100"
+              className="p-1.5 rounded-lg text-zinc-600 hover:text-zinc-300 hover:bg-zinc-700
+                transition-colors opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
             >
               <MoreHorizontal className="w-4 h-4" />
             </button>
@@ -155,7 +158,7 @@ export function InventoryTableRow({ card, onDelete, onRefresh }: Props) {
                     Record Sale
                   </button>
                   <button
-                    onClick={() => { setShowMenu(false) }}
+                    onClick={() => { setShowMenu(false); onEdit(card) }}
                     className="flex items-center gap-2 w-full px-3 py-2 text-xs text-zinc-300
                       hover:bg-zinc-800 transition-colors text-left"
                   >
@@ -164,10 +167,7 @@ export function InventoryTableRow({ card, onDelete, onRefresh }: Props) {
                   </button>
                   <div className="border-t border-zinc-800 my-0.5" />
                   <button
-                    onClick={() => {
-                      setShowMenu(false)
-                      if (confirm('Remove this card from inventory?')) onDelete(card.id)
-                    }}
+                    onClick={() => { setShowMenu(false); onRequestRemove(card) }}
                     className="flex items-center gap-2 w-full px-3 py-2 text-xs text-red-400
                       hover:bg-zinc-800 transition-colors text-left"
                   >

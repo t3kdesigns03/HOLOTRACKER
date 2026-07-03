@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./globals-additions.css"; /* .field / .field-label / .icon-btn / scrollbar utilities */
 
 :root {
   --background: #ffffff;
